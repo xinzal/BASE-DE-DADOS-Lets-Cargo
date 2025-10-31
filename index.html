@@ -23,21 +23,20 @@
     <tr>
       <th>Número do Pedido</th>
       <th>Fábrica</th>
-      <th>Código do Item</th>
+      <th>Código</th>
       <th>Descrição</th>
       <th>Quantidade</th>
-      <th>Data do Pedido</th>
+      <th>Data</th>
       <th>Ação</th>
     </tr>
   </thead>
   <tbody>
-    <!-- Pedidos aparecerão aqui -->
   </tbody>
 </table>
 
 <script>
-// COLOQUE AQUI O URL DO SEU WEB APP (o /exec)
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzciE9BWu6yUeWuGo1ufVMtuzKU7DJm7qWBh4jFVavobjflo9bcwygbu894nvBk5N1quQ/exec";
+// COLE AQUI O URL DO SEU WEB APP (o /exec)
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzT3Rs1XOv-CtmYKJ5ghMZplUvxL-n_UQ8jFJHudk_q-Jp7znBRuW0C9maInXMHnUMsow/exec";
 
 // Carrega pedidos via GET
 async function carregarPedidos() {
@@ -45,6 +44,7 @@ async function carregarPedidos() {
     const res = await fetch(WEB_APP_URL);
     if (!res.ok) throw new Error("Falha ao acessar Web App");
     const pedidos = await res.json();
+
     const tbody = document.querySelector("#pedidosTable tbody");
     tbody.innerHTML = "";
     pedidos.forEach(pedido => {
@@ -65,7 +65,7 @@ async function carregarPedidos() {
   }
 }
 
-// Linha expandida
+// Linha expandida para cadastro de pallets
 function toggleExpand(btn, numeroPedido) {
   const tr = btn.parentElement.parentElement;
   const nextTr = tr.nextElementSibling;
@@ -81,7 +81,7 @@ function toggleExpand(btn, numeroPedido) {
     <td colspan="7">
       <label>Quantidade de Pallets:</label><br>
       <input type="number" id="pallets_${numeroPedido}" min="0"><br>
-      <label>Peso da Separação:</label><br>
+      <label>Peso Separação:</label><br>
       <input type="number" id="peso_${numeroPedido}" min="0" step="0.01"><br>
       <label>Quantidade em Estoque:</label><br>
       <input type="number" id="estoque_${numeroPedido}" min="0"><br><br>
@@ -110,6 +110,7 @@ async function enviarDados(numeroPedido) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
+
     if (!res.ok) throw new Error("Falha ao enviar dados");
     const result = await res.json();
     alert(result.message);
@@ -121,7 +122,7 @@ async function enviarDados(numeroPedido) {
   }
 }
 
-// Inicializa
+// Inicializa ao carregar a página
 window.onload = carregarPedidos;
 </script>
 
