@@ -30,18 +30,16 @@
       <th>Ação</th>
     </tr>
   </thead>
-  <tbody>
-  </tbody>
+  <tbody></tbody>
 </table>
 
 <script>
-// COLE AQUI O URL DO SEU WEB APP (o /exec)
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzT3Rs1XOv-CtmYKJ5ghMZplUvxL-n_UQ8jFJHudk_q-Jp7znBRuW0C9maInXMHnUMsow/exec";
 
 // Carrega pedidos via GET
 async function carregarPedidos() {
   try {
-    const res = await fetch(WEB_APP_URL);
+    const res = await fetch(WEB_APP_URL + "?action=getPedidos");
     if (!res.ok) throw new Error("Falha ao acessar Web App");
     const pedidos = await res.json();
 
@@ -56,7 +54,7 @@ async function carregarPedidos() {
         <td>${pedido.descricao}</td>
         <td>${pedido.quantidade}</td>
         <td>${pedido.dataPedido}</td>
-        <td><button onclick="toggleExpand(this, ${pedido.numero})">Lets Cargo</button></td>
+        <td><button onclick="toggleExpand(this, '${pedido.numero}')">Lets Cargo</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -85,7 +83,7 @@ function toggleExpand(btn, numeroPedido) {
       <input type="number" id="peso_${numeroPedido}" min="0" step="0.01"><br>
       <label>Quantidade em Estoque:</label><br>
       <input type="number" id="estoque_${numeroPedido}" min="0"><br><br>
-      <button onclick="enviarDados(${numeroPedido})">Salvar</button>
+      <button onclick="enviarDados('${numeroPedido}')">Salvar</button>
     </td>
   `;
   tr.parentNode.insertBefore(expandTr, tr.nextSibling);
@@ -102,7 +100,13 @@ async function enviarDados(numeroPedido) {
     return;
   }
 
-  const data = { numeroPedido, pallets, peso, estoque };
+  const data = { 
+    tipo: "letscargo",
+    numeroPedido,
+    pallets: Number(pallets),
+    peso: Number(peso),
+    estoque: Number(estoque)
+  };
 
   try {
     const res = await fetch(WEB_APP_URL, {
