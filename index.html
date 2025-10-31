@@ -34,7 +34,7 @@
 </table>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7T96kScmCz9-hIR2GtNqPdlzhifn4sGDWPrHzION5mR_hq8vCHg3_iLS-lDZw2S73RQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyrLkliRRIr34sSG-WpqgQaivHL-VTsHPMk5wxegKnM86Ey3i09QzjwhQtPTM1ceCA8FQ/exec";
 
 // Carrega pedidos via GET
 async function carregarPedidos() {
@@ -122,7 +122,7 @@ async function enviarDados(numeroPedido) {
     const expandTr = document.getElementById(`pallets_${numeroPedido}`).closest("tr");
     if (expandTr) expandTr.remove();
 
-    // Recarrega a tabela para atualizar visualização
+    // Atualiza a tabela
     carregarPedidos();
   } catch (err) {
     alert("Erro ao salvar dados: " + err.message);
