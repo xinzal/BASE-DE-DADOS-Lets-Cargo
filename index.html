@@ -34,7 +34,7 @@
 </table>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyrLkliRRIr34sSG-WpqgQaivHL-VTsHPMk5wxegKnM86Ey3i09QzjwhQtPTM1ceCA8FQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyT_QWU_w0Mon5XvMfOG1JPScQ1BZxugF5NqRayx4c-8wuPzXV3t39isIfmM6zXsqD6XA/exec";
 
 // Carrega pedidos via GET
 async function carregarPedidos() {
@@ -89,7 +89,7 @@ function toggleExpand(btn, numeroPedido) {
   tr.parentNode.insertBefore(expandTr, tr.nextSibling);
 }
 
-// Envia dados via POST
+// Envia dados via POST para aba LetsCargo
 async function enviarDados(numeroPedido) {
   const pallets = document.getElementById(`pallets_${numeroPedido}`).value;
   const peso = document.getElementById(`peso_${numeroPedido}`).value;
