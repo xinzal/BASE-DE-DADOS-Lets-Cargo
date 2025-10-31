@@ -11,10 +11,8 @@
   th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
   th { background-color: #003c8f; color: white; }
   button { padding: 5px 10px; cursor: pointer; }
-  .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-           background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; }
-  .modal-content { background-color: #fff; padding: 20px; border-radius: 5px; width: 300px; }
-  .modal input { width: 100%; padding: 5px; margin: 5px 0; }
+  .expand-row td { background-color: #e0e0e0; }
+  .expand-row input { width: 80%; margin: 2px 0; padding: 4px; }
 </style>
 </head>
 <body>
@@ -37,26 +35,9 @@
   </tbody>
 </table>
 
-<!-- Modal de preenchimento Lets Cargo -->
-<div class="modal" id="letsCargoModal">
-  <div class="modal-content">
-    <h3>Preencher Dados Lets Cargo</h3>
-    <input type="hidden" id="pedidoId">
-    <label>Quantidade de Pallets:</label>
-    <input type="number" id="pallets" min="0">
-    <label>Peso da Separação:</label>
-    <input type="number" id="peso" min="0" step="0.01">
-    <label>Quantidade em Estoque:</label>
-    <input type="number" id="estoque" min="0">
-    <button onclick="enviarDados()">Salvar</button>
-    <button onclick="fecharModal()">Cancelar</button>
-  </div>
-</div>
-
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzL0aSAbKKLdbRB0_Yvc2m8Uv3BNda9fMsZskIqRaNgWBbjCmFt0qLjJrTifT7a9UAmcQ/exec";
+const WEB_APP_URL = "COLE_AQUI_O_URL_DO_SEU_WEBAPP";
 
-// Carrega pedidos da planilha
 async function carregarPedidos() {
   try {
     const res = await fetch(WEB_APP_URL);
@@ -72,7 +53,7 @@ async function carregarPedidos() {
         <td>${pedido.descricao}</td>
         <td>${pedido.quantidade}</td>
         <td>${pedido.dataPedido}</td>
-        <td><button onclick="abrirModal(${pedido.numero})">Lets Cargo</button></td>
+        <td><button onclick="toggleExpand(this, ${pedido.numero})">Lets Cargo</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -81,26 +62,39 @@ async function carregarPedidos() {
   }
 }
 
-// Abre o modal
-function abrirModal(numeroPedido) {
-  document.getElementById("pedidoId").value = numeroPedido;
-  document.getElementById("pallets").value = "";
-  document.getElementById("peso").value = "";
-  document.getElementById("estoque").value = "";
-  document.getElementById("letsCargoModal").style.display = "flex";
+// Cria/fecha a linha expandida para cadastro
+function toggleExpand(btn, numeroPedido) {
+  const tr = btn.parentElement.parentElement;
+  const nextTr = tr.nextElementSibling;
+
+  // Se já existir linha expandida, remove
+  if (nextTr && nextTr.classList.contains("expand-row")) {
+    nextTr.remove();
+    return;
+  }
+
+  // Cria linha expandida
+  const expandTr = document.createElement("tr");
+  expandTr.classList.add("expand-row");
+  expandTr.innerHTML = `
+    <td colspan="7">
+      <label>Quantidade de Pallets:</label><br>
+      <input type="number" id="pallets_${numeroPedido}" min="0"><br>
+      <label>Peso da Separação:</label><br>
+      <input type="number" id="peso_${numeroPedido}" min="0" step="0.01"><br>
+      <label>Quantidade em Estoque:</label><br>
+      <input type="number" id="estoque_${numeroPedido}" min="0"><br><br>
+      <button onclick="enviarDados(${numeroPedido})">Salvar</button>
+    </td>
+  `;
+  tr.parentNode.insertBefore(expandTr, tr.nextSibling);
 }
 
-// Fecha o modal
-function fecharModal() {
-  document.getElementById("letsCargoModal").style.display = "none";
-}
-
-// Envia os dados para o Web App
-async function enviarDados() {
-  const numeroPedido = document.getElementById("pedidoId").value;
-  const pallets = document.getElementById("pallets").value;
-  const peso = document.getElementById("peso").value;
-  const estoque = document.getElementById("estoque").value;
+// Envia os dados via POST
+async function enviarDados(numeroPedido) {
+  const pallets = document.getElementById(`pallets_${numeroPedido}`).value;
+  const peso = document.getElementById(`peso_${numeroPedido}`).value;
+  const estoque = document.getElementById(`estoque_${numeroPedido}`).value;
 
   if (!pallets || !peso || !estoque) {
     alert("Preencha todos os campos!");
@@ -117,13 +111,16 @@ async function enviarDados() {
     });
     const result = await res.json();
     alert(result.message);
-    fecharModal();
+
+    // Fecha a aba expandida
+    const expandTr = document.getElementById(`pallets_${numeroPedido}`).closest("tr");
+    if (expandTr) expandTr.remove();
   } catch (err) {
     alert("Erro ao salvar dados: " + err.message);
   }
 }
 
-// Carrega os pedidos ao abrir a página
+// Carrega pedidos ao abrir a página
 window.onload = carregarPedidos;
 </script>
 
