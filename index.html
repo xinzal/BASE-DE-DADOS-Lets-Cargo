@@ -31,18 +31,19 @@
     </tr>
   </thead>
   <tbody>
-    <!-- Pedidos vão aparecer aqui -->
+    <!-- Pedidos aparecerão aqui -->
   </tbody>
 </table>
 
 <script>
-// Coloque aqui o URL do seu Web App (o /exec do Apps Script)
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyY9SVM9opQ4a4gpUjsn-Jg9D1M-IrCDvWmXiQDEX1rbDdNDzmVVuOfPbiO1IvIazajBA/exec";
+// COLOQUE AQUI O URL DO SEU WEB APP (o /exec)
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzciE9BWu6yUeWuGo1ufVMtuzKU7DJm7qWBh4jFVavobjflo9bcwygbu894nvBk5N1quQ/exec";
 
-// Carrega pedidos da planilha
+// Carrega pedidos via GET
 async function carregarPedidos() {
   try {
     const res = await fetch(WEB_APP_URL);
+    if (!res.ok) throw new Error("Falha ao acessar Web App");
     const pedidos = await res.json();
     const tbody = document.querySelector("#pedidosTable tbody");
     tbody.innerHTML = "";
@@ -64,7 +65,7 @@ async function carregarPedidos() {
   }
 }
 
-// Abre/fecha linha expandida
+// Linha expandida
 function toggleExpand(btn, numeroPedido) {
   const tr = btn.parentElement.parentElement;
   const nextTr = tr.nextElementSibling;
@@ -106,9 +107,10 @@ async function enviarDados(numeroPedido) {
   try {
     const res = await fetch(WEB_APP_URL, {
       method: "POST",
-      body: JSON.stringify(data),
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
     });
+    if (!res.ok) throw new Error("Falha ao enviar dados");
     const result = await res.json();
     alert(result.message);
 
