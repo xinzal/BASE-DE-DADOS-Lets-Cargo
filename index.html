@@ -36,8 +36,10 @@
 </table>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyRSoJ8YJ0txk4YUHPVT5xBLOggwI_JDYFKLnI9vB1mF_W_DwvV2l-91IrvKPLlAnV-rw/exec";
+// Coloque aqui o URL do seu Web App (o /exec do Apps Script)
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzDOlaZu6peyI9R02DPyH8eQfdyHlkmaJzUPATtEP_Xk4zwKytZhDuA5iFIBWcw2P-Ldg/exec";
 
+// Carrega pedidos da planilha
 async function carregarPedidos() {
   try {
     const res = await fetch(WEB_APP_URL);
@@ -62,18 +64,16 @@ async function carregarPedidos() {
   }
 }
 
-// Cria/fecha a linha expandida para cadastro
+// Abre/fecha linha expandida
 function toggleExpand(btn, numeroPedido) {
   const tr = btn.parentElement.parentElement;
   const nextTr = tr.nextElementSibling;
 
-  // Se já existir linha expandida, remove
   if (nextTr && nextTr.classList.contains("expand-row")) {
     nextTr.remove();
     return;
   }
 
-  // Cria linha expandida
   const expandTr = document.createElement("tr");
   expandTr.classList.add("expand-row");
   expandTr.innerHTML = `
@@ -90,7 +90,7 @@ function toggleExpand(btn, numeroPedido) {
   tr.parentNode.insertBefore(expandTr, tr.nextSibling);
 }
 
-// Envia os dados via POST
+// Envia dados via POST
 async function enviarDados(numeroPedido) {
   const pallets = document.getElementById(`pallets_${numeroPedido}`).value;
   const peso = document.getElementById(`peso_${numeroPedido}`).value;
@@ -112,7 +112,6 @@ async function enviarDados(numeroPedido) {
     const result = await res.json();
     alert(result.message);
 
-    // Fecha a aba expandida
     const expandTr = document.getElementById(`pallets_${numeroPedido}`).closest("tr");
     if (expandTr) expandTr.remove();
   } catch (err) {
@@ -120,7 +119,7 @@ async function enviarDados(numeroPedido) {
   }
 }
 
-// Carrega pedidos ao abrir a página
+// Inicializa
 window.onload = carregarPedidos;
 </script>
 
