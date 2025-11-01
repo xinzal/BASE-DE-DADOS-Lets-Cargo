@@ -3,205 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Controle de Solicitações FAB</title>
+<title>LetsCargo Dashboard - Visualizar Pedidos</title>
 <style>
-  :root {
-    --primary: #1976d2;
-    --secondary: #1565c0;
-    --accent: #64b5f6;
-    --background: #f5f7fa;
-    --card-bg: #ffffff;
-    --text: #333;
-    --border-radius: 12px;
-  }
-
+  /* ===== BODY ===== */
   body {
-    font-family: "Segoe UI", Roboto, Arial, sans-serif;
-    background: var(--background);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7fa;
     margin: 0;
     padding: 0;
   }
 
+  /* ===== CABEÇALHO ===== */
   header {
-    background: var(--primary);
+    background-color: #0073c9;
     color: white;
     padding: 20px;
     text-align: center;
-    font-size: 1.5em;
-    font-weight: 600;
-    letter-spacing: 1px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   }
 
-  main {
-    padding: 30px;
+  header h1 {
+    margin: 0;
+    font-size: 28px;
   }
 
-  h1 {
-    color: var(--primary);
-    margin-bottom: 20px;
-    text-align: center;
+  /* ===== CONTAINER ===== */
+  .container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 0 20px;
   }
 
-  .filters {
+  /* ===== CARDS DE RESUMO ===== */
+  .cards {
     display: flex;
-    gap: 15px;
-    margin-bottom: 15px;
     flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 25px;
     justify-content: center;
   }
 
-  .filters input, .filters select {
-    padding: 8px 12px;
-    border-radius: var(--border-radius);
-    border: 1px solid #ccc;
-    font-size: 1em;
+  .card {
+    flex: 1 1 200px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    transition: 0.3s;
   }
 
+  .card:hover {
+    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+  }
+
+  .card h2 {
+    margin: 10px 0 0 0;
+    font-size: 24px;
+    color: #0073c9;
+  }
+
+  .card p {
+    margin: 0;
+    color: #555;
+    font-weight: bold;
+  }
+
+  /* ===== FILTROS ===== */
+  .filtros {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 15px;
+    justify-content: center;
+  }
+
+  .filtros label {
+    font-weight: bold;
+    margin-right: 5px;
+  }
+
+  .filtros select,
+  .filtros input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    outline: none;
+    font-size: 14px;
+    transition: 0.2s;
+  }
+
+  .filtros select:focus,
+  .filtros input:focus {
+    border-color: #0073c9;
+    box-shadow: 0 0 5px rgba(0,115,201,0.3);
+  }
+
+  /* ===== TABELA ===== */
   table {
     width: 100%;
     border-collapse: collapse;
-    background: var(--card-bg);
-    border-radius: var(--border-radius);
+    background-color: #fff;
+    border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
   }
 
   th, td {
-    padding: 12px 10px;
+    padding: 12px 15px;
     text-align: left;
-    border-bottom: 1px solid #eee;
-    font-size: 0.95em;
   }
 
   th {
-    background: var(--primary);
+    background-color: #0073c9;
     color: white;
-    font-weight: 500;
+    font-weight: 600;
   }
 
-  tr:hover {
-    background: #f1f8ff;
+  tbody tr:nth-child(even) {
+    background-color: #f8f9fb;
   }
 
-  tr.green {
-    background: #c8f7c5 !important;
+  tbody tr:hover {
+    background-color: #dbe9f7;
   }
 
+  tbody tr.cadastrado {
+    background-color: #c8f7c5 !important;
+  }
+
+  /* ===== BOTÕES ===== */
   button {
-    padding: 6px 10px;
+    padding: 6px 12px;
     border: none;
-    border-radius: var(--border-radius);
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.9em;
+    font-weight: bold;
+    transition: 0.2s;
   }
 
-  .btn-pdf {
-    background: var(--primary);
+  .btn-acao {
+    background-color: #0073c9;
     color: white;
   }
 
-  .btn-pdf:hover {
-    background: var(--secondary);
-  }
-
-  .btn-email {
-    background: #43a047;
-    color: white;
-    margin-left: 5px;
-  }
-
-  .btn-email:hover {
-    background: #388e3c;
-  }
-
-  /* Modal */
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 10;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
-    background-color: rgba(0,0,0,0.5);
-  }
-
-  .modal-content {
-    background-color: var(--card-bg);
-    margin: 8% auto;
-    padding: 20px;
-    width: 320px;
-    border-radius: var(--border-radius);
-    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
-  }
-
-  .modal-content h2 {
-    margin-top: 0;
-    color: var(--primary);
-  }
-
-  .modal-content input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    border-radius: var(--border-radius);
-    border: 1px solid #ccc;
-    box-sizing: border-box;
+  .btn-acao:hover {
+    background-color: #005fa3;
   }
 
   .close-btn {
     background-color: red;
     color: white;
     float: right;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  /* ===== MODAL ===== */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+
+  .modal-content {
+    background-color: #fff;
+    margin: 8% auto;
+    padding: 25px 20px;
+    width: 350px;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    position: relative;
+    animation: slideDown 0.3s ease;
+  }
+
+  .modal-content h2 {
+    margin-top: 0;
+    color: #0073c9;
+    text-align: center;
+  }
+
+  .modal-content input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+  }
+
+  .modal-content input:focus {
+    border-color: #0073c9;
+    box-shadow: 0 0 5px rgba(0,115,201,0.3);
+  }
+
+  @keyframes slideDown {
+    from { transform: translateY(-50px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
   }
 </style>
 </head>
 <body>
 
-<header>Controle de Solicitações FAB</header>
-<main>
-<h1>Pedidos</h1>
+<header>
+  <h1>LetsCargo Dashboard</h1>
+</header>
 
-<div class="filters">
-  <label>Filtrar Fábrica:
-    <select id="filtroFabrica" onchange="filtrarTabela()">
-      <option value="">Todas</option>
-    </select>
-  </label>
-  <label>Pesquisar Pedido:
-    <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Número do Pedido">
-  </label>
+<div class="container">
+
+  <!-- CARDS DE RESUMO -->
+  <div class="cards">
+    <div class="card">
+      <p>Total de Pedidos</p>
+      <h2 id="totalPedidos">0</h2>
+    </div>
+    <div class="card">
+      <p>Pedidos Cadastrados</p>
+      <h2 id="pedidosCadastrados">0</h2>
+    </div>
+    <div class="card">
+      <p>Pedidos Pendentes</p>
+      <h2 id="pedidosPendentes">0</h2>
+    </div>
+  </div>
+
+  <!-- FILTRO E PESQUISA -->
+  <div class="filtros">
+    <div>
+      <label for="filtroFabrica">Filtrar por Fábrica:</label>
+      <select id="filtroFabrica" onchange="filtrarTabela()">
+        <option value="">Todas</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="pesquisaPedido">Pesquisar Número do Pedido:</label>
+      <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Digite o número do pedido">
+    </div>
+  </div>
+
+  <!-- TABELA -->
+  <table id="pedidosTable">
+    <thead>
+      <tr>
+        <th>Número do Pedido</th>
+        <th>Fábrica</th>
+        <th>Código do Item</th>
+        <th>Descrição</th>
+        <th>Quantidade</th>
+        <th>Data do Pedido</th>
+        <th>Ações</th>
+      </tr>
+    </thead>
+    <tbody id="pedidosBody">
+      <tr><td colspan="7">Carregando pedidos...</td></tr>
+    </tbody>
+  </table>
+
 </div>
 
-<table id="pedidosTable">
-  <thead>
-    <tr>
-      <th>Número do Pedido</th>
-      <th>Fábrica</th>
-      <th>Código do Item</th>
-      <th>Descrição</th>
-      <th>Quantidade</th>
-      <th>Data do Pedido</th>
-      <th>Pallets</th>
-      <th>Peso Separação</th>
-      <th>Quantidade Estoque</th>
-      <th>PDF Remessa</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
-  <tbody id="pedidosBody">
-    <tr><td colspan="11" style="text-align:center;">Carregando pedidos...</td></tr>
-  </tbody>
-</table>
-
-<!-- Modal para cadastro de emails -->
-<div id="modalEmail" class="modal">
+<!-- MODAL DE CADASTRO -->
+<div id="modalCadastro" class="modal">
   <div class="modal-content">
     <button class="close-btn" onclick="fecharModal()">X</button>
-    <h2>Cadastrar E-mails</h2>
-    <input type="text" id="fabricaEmail" placeholder="Fábrica">
-    <input type="text" id="emailPrincipal" placeholder="E-mail Principal (separe por vírgula)">
-    <input type="text" id="emailCopia" placeholder="E-mail Cópia (opcional)">
-    <button class="btn-email" onclick="salvarEmail()">Salvar E-mails</button>
+    <h2>Cadastrar Dados</h2>
+    <input type="number" id="pallets" placeholder="Pallets">
+    <input type="number" id="peso" placeholder="Peso Separação (kg)">
+    <input type="number" id="estoque" placeholder="Quantidade em Estoque">
+    <button class="btn-acao" onclick="enviarDados()">Enviar</button>
   </div>
 </div>
 
@@ -209,30 +282,25 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyzRQQNQcTmcgkihOKmFj_MKRpzZBmjdlQGyaNj1BZ59IV89UWI0RzP3o7VRHsWrGTmTA/exec";
 let pedidoSelecionado = null;
 
-// ====== CARREGAR PEDIDOS ======
+// ===== CARREGAR PEDIDOS =====
 async function carregarPedidos() {
   const tbody = document.getElementById("pedidosBody");
-  tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Carregando...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
 
   try {
     const res = await fetch(WEB_APP_URL + "?action=get");
     const pedidos = await res.json();
 
     if (pedidos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum pedido encontrado</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum pedido encontrado</td></tr>`;
       return;
     }
 
     tbody.innerHTML = "";
-    pedidos.forEach((p,i) => {
+    let cadastrados = 0;
+
+    pedidos.forEach((p, i) => {
       const tr = document.createElement("tr");
-      tr.dataset.index = i;
-      tr.dataset.numero = p.numero;
-      tr.dataset.fabrica = p.fabrica;
-      tr.dataset.codigo = p.codigo;
-
-      if(p.pdf) tr.classList.add("green");
-
       tr.innerHTML = `
         <td>${p.numero}</td>
         <td>${p.fabrica}</td>
@@ -240,29 +308,44 @@ async function carregarPedidos() {
         <td>${p.descricao}</td>
         <td>${p.quantidade}</td>
         <td>${p.dataPedido}</td>
-        <td>${p.pallets}</td>
-        <td>${p.peso}</td>
-        <td>${p.estoque}</td>
-        <td>${p.pdf ? `<a href="${p.pdf}" target="_blank">Ver PDF</a>` : ""}</td>
-        <td>
-          <button class="btn-pdf" onclick="abrirModalEmail(${i})">Cadastrar E-mails</button>
-        </td>
+        <td><button class="btn-acao" onclick="abrirModal(${i})">Cadastrar Dados</button></td>
       `;
+      tr.dataset.index = i;
+      tr.dataset.numero = p.numero;
+      tr.dataset.fabrica = p.fabrica;
+      tr.dataset.codigo = p.codigo;
+      tr.dataset.descricao = p.descricao;
+      tr.dataset.quantidade = p.quantidade;
+
+      if (p.pallets || p.peso || p.estoque) {
+        tr.classList.add('cadastrado');
+        cadastrados++;
+      }
+
       tbody.appendChild(tr);
     });
 
     atualizarFiltroFabrica(pedidos);
-  } catch(err) {
-    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Erro ao carregar pedidos</td></tr>`;
+    atualizarResumo(pedidos.length, cadastrados);
+
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar pedidos</td></tr>`;
   }
 }
 
-// ====== FILTRO ======
-function atualizarFiltroFabrica(pedidos){
+// ===== RESUMO =====
+function atualizarResumo(total, cadastrados) {
+  document.getElementById("totalPedidos").innerText = total;
+  document.getElementById("pedidosCadastrados").innerText = cadastrados;
+  document.getElementById("pedidosPendentes").innerText = total - cadastrados;
+}
+
+// ===== FILTRO =====
+function atualizarFiltroFabrica(pedidos) {
   const select = document.getElementById("filtroFabrica");
-  const fabricas = [...new Set(pedidos.map(p=>p.fabrica))];
-  select.innerHTML = `<option value="">Todas</option>`;
-  fabricas.forEach(f=>{
+  select.innerHTML = '<option value="">Todas</option>';
+  const fabricas = [...new Set(pedidos.map(p => p.fabrica))];
+  fabricas.forEach(f => {
     const option = document.createElement("option");
     option.value = f;
     option.textContent = f;
@@ -273,52 +356,92 @@ function atualizarFiltroFabrica(pedidos){
 function filtrarTabela() {
   const filtroFabrica = document.getElementById("filtroFabrica").value.toLowerCase();
   const pesquisaPedido = document.getElementById("pesquisaPedido").value.toLowerCase();
-  document.querySelectorAll("#pedidosBody tr").forEach(tr=>{
+  const linhas = document.querySelectorAll("#pedidosBody tr");
+
+  linhas.forEach(tr => {
     const numero = tr.dataset.numero.toLowerCase();
     const fabrica = tr.dataset.fabrica.toLowerCase();
-    const mostrar = (filtroFabrica=="" || fabrica===filtroFabrica) &&
-                    (pesquisaPedido=="" || numero.includes(pesquisaPedido));
+    const mostrar =
+      (filtroFabrica === "" || fabrica === filtroFabrica) &&
+      (pesquisaPedido === "" || numero.includes(pesquisaPedido));
     tr.style.display = mostrar ? "" : "none";
   });
 }
 
-// ====== MODAL E-MAIL ======
-function abrirModalEmail(index){
+// ===== MODAL =====
+function abrirModal(index) {
   const row = document.querySelector(`tr[data-index='${index}']`);
   pedidoSelecionado = {
     numero: row.dataset.numero,
     fabrica: row.dataset.fabrica,
-    codigo: row.dataset.codigo
+    codigo: row.dataset.codigo,
+    descricao: row.dataset.descricao,
+    quantidade: row.dataset.quantidade
   };
-  document.getElementById("modalEmail").style.display="block";
+  document.getElementById("modalCadastro").style.display = "block";
 }
 
-function fecharModal(){
-  document.getElementById("modalEmail").style.display="none";
+function fecharModal() {
+  document.getElementById("modalCadastro").style.display = "none";
   pedidoSelecionado = null;
-  document.getElementById("fabricaEmail").value="";
-  document.getElementById("emailPrincipal").value="";
-  document.getElementById("emailCopia").value="";
+  document.getElementById("pallets").value = "";
+  document.getElementById("peso").value = "";
+  document.getElementById("estoque").value = "";
 }
 
-// ====== SALVAR EMAIL ======
-async function salvarEmail(){
-  const fabrica = document.getElementById("fabricaEmail").value;
-  const emailPrincipal = document.getElementById("emailPrincipal").value;
-  const emailCopia = document.getElementById("emailCopia").value;
+// ===== ENVIAR DADOS =====
+async function enviarDados() {
+  if (!pedidoSelecionado) return;
 
-  if(!fabrica || !emailPrincipal){ alert("Preencha a fábrica e o e-mail principal."); return; }
+  const pallets = document.getElementById("pallets").value.trim();
+  const peso = document.getElementById("peso").value.trim();
+  const estoque = document.getElementById("estoque").value.trim();
 
-  try{
-    const res = await fetch(WEB_APP_URL+`?action=salvarEmail&fabrica=${encodeURIComponent(fabrica)}&emailPrincipal=${encodeURIComponent(emailPrincipal)}&emailCopia=${encodeURIComponent(emailCopia)}`);
-    const result = await res.text();
-    if(result.includes("success")){ alert("E-mails salvos com sucesso"); fecharModal(); }
-    else alert("Erro ao salvar e-mails");
-  } catch { alert("Erro de conexão"); }
+  if (!pallets || !peso || !estoque) {
+    alert("Preencha todos os campos antes de enviar.");
+    return;
+  }
+
+  const dados = {
+    numero: pedidoSelecionado.numero,
+    fabrica: pedidoSelecionado.fabrica,
+    itens: [{
+      codigo: pedidoSelecionado.codigo,
+      descricao: pedidoSelecionado.descricao,
+      quantidade: pedidoSelecionado.quantidade,
+      pallets,
+      peso,
+      estoque
+    }]
+  };
+
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(dados)
+    });
+    const result = await response.json();
+    if (result.status === "success") {
+      alert("Dados enviados com sucesso!");
+      const linhas = document.querySelectorAll("#pedidosBody tr");
+      linhas.forEach(tr => {
+        if (tr.dataset.numero === pedidoSelecionado.numero && tr.dataset.codigo === pedidoSelecionado.codigo) {
+          tr.classList.add('cadastrado');
+        }
+      });
+      carregarPedidos();
+      fecharModal();
+    } else {
+      alert("Erro ao salvar: " + result.message);
+    }
+  } catch (err) {
+    alert("Erro de conexão com o servidor.");
+  }
 }
 
-// ====== INÍCIO ======
+// ===== INÍCIO =====
 carregarPedidos();
 </script>
+
 </body>
 </html>
