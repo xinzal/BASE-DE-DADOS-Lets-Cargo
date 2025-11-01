@@ -3,38 +3,151 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LetsCargo - Visualizar Pedidos</title>
+<title>Controle de Solicitações FAB</title>
 <style>
-  body { font-family: Arial, sans-serif; background-color: #f2f4f8; padding: 20px; }
-  h1 { color: #003c8f; margin-bottom: 20px; }
-  table { width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 15px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  th { background-color: #0073c9; color: white; }
-  button { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
-  .btn-acao { background-color: #0073c9; color: white; }
-  .btn-acao:hover { background-color: #005fa3; }
+  :root {
+    --primary: #1976d2;
+    --secondary: #1565c0;
+    --accent: #64b5f6;
+    --background: #f5f7fa;
+    --card-bg: #ffffff;
+    --text: #333;
+    --border-radius: 12px;
+  }
+
+  body {
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--background);
+    margin: 0;
+    padding: 0;
+  }
+
+  header {
+    background: var(--primary);
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: 600;
+    letter-spacing: 1px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  }
+
+  main {
+    padding: 30px;
+  }
+
+  h1 {
+    color: var(--primary);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .filters {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .filters input, .filters select {
+    padding: 8px 12px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
+    font-size: 1em;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--card-bg);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+  }
+
+  th, td {
+    padding: 12px 10px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+    font-size: 0.95em;
+  }
+
+  th {
+    background: var(--primary);
+    color: white;
+    font-weight: 500;
+  }
+
+  tr:hover {
+    background: #f1f8ff;
+  }
+
+  tr.green {
+    background: #c8f7c5 !important;
+  }
+
+  button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: 0.9em;
+  }
+
+  .btn-pdf {
+    background: var(--primary);
+    color: white;
+  }
+
+  .btn-pdf:hover {
+    background: var(--secondary);
+  }
+
+  .btn-email {
+    background: #43a047;
+    color: white;
+    margin-left: 5px;
+  }
+
+  .btn-email:hover {
+    background: #388e3c;
+  }
+
+  /* Modal */
   .modal {
     display: none;
     position: fixed;
     z-index: 10;
-    left: 0; top: 0; width: 100%; height: 100%;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.5);
   }
+
   .modal-content {
-    background-color: white;
-    margin: 10% auto;
+    background-color: var(--card-bg);
+    margin: 8% auto;
     padding: 20px;
-    width: 300px;
-    border-radius: 8px;
+    width: 320px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
   }
-  .modal-content h2 { margin-top: 0; }
+
+  .modal-content h2 {
+    margin-top: 0;
+    color: var(--primary);
+  }
+
   .modal-content input {
     width: 100%;
     padding: 8px;
-    margin-top: 5px;
     margin-bottom: 10px;
+    border-radius: var(--border-radius);
+    border: 1px solid #ccc;
     box-sizing: border-box;
   }
+
   .close-btn {
     background-color: red;
     color: white;
@@ -44,17 +157,19 @@
 </head>
 <body>
 
-<h1>Visualizar Pedidos - LetsCargo</h1>
+<header>Controle de Solicitações FAB</header>
+<main>
+<h1>Pedidos</h1>
 
-<!-- FILTRO E PESQUISA -->
-<div style="margin-bottom: 10px;">
-  <label for="filtroFabrica">Filtrar por Fábrica:</label>
-  <select id="filtroFabrica" onchange="filtrarTabela()">
-    <option value="">Todas</option>
-  </select>
-
-  <label for="pesquisaPedido" style="margin-left: 20px;">Pesquisar Número do Pedido:</label>
-  <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Digite o número do pedido">
+<div class="filters">
+  <label>Filtrar Fábrica:
+    <select id="filtroFabrica" onchange="filtrarTabela()">
+      <option value="">Todas</option>
+    </select>
+  </label>
+  <label>Pesquisar Pedido:
+    <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Número do Pedido">
+  </label>
 </div>
 
 <table id="pedidosTable">
@@ -66,23 +181,27 @@
       <th>Descrição</th>
       <th>Quantidade</th>
       <th>Data do Pedido</th>
+      <th>Pallets</th>
+      <th>Peso Separação</th>
+      <th>Quantidade Estoque</th>
+      <th>PDF Remessa</th>
       <th>Ações</th>
     </tr>
   </thead>
   <tbody id="pedidosBody">
-    <tr><td colspan="7">Carregando pedidos...</td></tr>
+    <tr><td colspan="11" style="text-align:center;">Carregando pedidos...</td></tr>
   </tbody>
 </table>
 
-<!-- Modal de Cadastro -->
-<div id="modalCadastro" class="modal">
+<!-- Modal para cadastro de emails -->
+<div id="modalEmail" class="modal">
   <div class="modal-content">
     <button class="close-btn" onclick="fecharModal()">X</button>
-    <h2>Cadastrar Dados</h2>
-    <input type="number" id="pallets" placeholder="Pallets">
-    <input type="number" id="peso" placeholder="Peso Separação (kg)">
-    <input type="number" id="estoque" placeholder="Quantidade em Estoque">
-    <button class="btn-acao" onclick="enviarDados()">Enviar</button>
+    <h2>Cadastrar E-mails</h2>
+    <input type="text" id="fabricaEmail" placeholder="Fábrica">
+    <input type="text" id="emailPrincipal" placeholder="E-mail Principal (separe por vírgula)">
+    <input type="text" id="emailCopia" placeholder="E-mail Cópia (opcional)">
+    <button class="btn-email" onclick="salvarEmail()">Salvar E-mails</button>
   </div>
 </div>
 
@@ -90,23 +209,30 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyzRQQNQcTmcgkihOKmFj_MKRpzZBmjdlQGyaNj1BZ59IV89UWI0RzP3o7VRHsWrGTmTA/exec";
 let pedidoSelecionado = null;
 
-// ======== CARREGAR PEDIDOS ========
+// ====== CARREGAR PEDIDOS ======
 async function carregarPedidos() {
   const tbody = document.getElementById("pedidosBody");
-  tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
+  tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Carregando...</td></tr>`;
 
   try {
     const res = await fetch(WEB_APP_URL + "?action=get");
     const pedidos = await res.json();
 
     if (pedidos.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7">Nenhum pedido encontrado</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Nenhum pedido encontrado</td></tr>`;
       return;
     }
 
     tbody.innerHTML = "";
-    pedidos.forEach((p, i) => {
+    pedidos.forEach((p,i) => {
       const tr = document.createElement("tr");
+      tr.dataset.index = i;
+      tr.dataset.numero = p.numero;
+      tr.dataset.fabrica = p.fabrica;
+      tr.dataset.codigo = p.codigo;
+
+      if(p.pdf) tr.classList.add("green");
+
       tr.innerHTML = `
         <td>${p.numero}</td>
         <td>${p.fabrica}</td>
@@ -114,36 +240,29 @@ async function carregarPedidos() {
         <td>${p.descricao}</td>
         <td>${p.quantidade}</td>
         <td>${p.dataPedido}</td>
-        <td><button class="btn-acao" onclick="abrirModal(${i})">Cadastrar Dados</button></td>
+        <td>${p.pallets}</td>
+        <td>${p.peso}</td>
+        <td>${p.estoque}</td>
+        <td>${p.pdf ? `<a href="${p.pdf}" target="_blank">Ver PDF</a>` : ""}</td>
+        <td>
+          <button class="btn-pdf" onclick="abrirModalEmail(${i})">Cadastrar E-mails</button>
+        </td>
       `;
-      tr.dataset.index = i;
-      tr.dataset.numero = p.numero;
-      tr.dataset.fabrica = p.fabrica;
-      tr.dataset.codigo = p.codigo;
-      tr.dataset.descricao = p.descricao;
-      tr.dataset.quantidade = p.quantidade;
-
-      // linha verde se já houver cadastro
-      if (p.pallets || p.peso || p.estoque) {
-        tr.style.backgroundColor = "#c8f7c5";
-      }
-
       tbody.appendChild(tr);
     });
 
-    // popular filtro de fábrica
     atualizarFiltroFabrica(pedidos);
-
-  } catch (err) {
-    tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar pedidos</td></tr>`;
+  } catch(err) {
+    tbody.innerHTML = `<tr><td colspan="11" style="text-align:center;">Erro ao carregar pedidos</td></tr>`;
   }
 }
 
-// ======== FILTRO E PESQUISA ========
-function atualizarFiltroFabrica(pedidos) {
+// ====== FILTRO ======
+function atualizarFiltroFabrica(pedidos){
   const select = document.getElementById("filtroFabrica");
-  const fabricas = [...new Set(pedidos.map(p => p.fabrica))];
-  fabricas.forEach(f => {
+  const fabricas = [...new Set(pedidos.map(p=>p.fabrica))];
+  select.innerHTML = `<option value="">Todas</option>`;
+  fabricas.forEach(f=>{
     const option = document.createElement("option");
     option.value = f;
     option.textContent = f;
@@ -154,96 +273,52 @@ function atualizarFiltroFabrica(pedidos) {
 function filtrarTabela() {
   const filtroFabrica = document.getElementById("filtroFabrica").value.toLowerCase();
   const pesquisaPedido = document.getElementById("pesquisaPedido").value.toLowerCase();
-  const linhas = document.querySelectorAll("#pedidosBody tr");
-
-  linhas.forEach(tr => {
+  document.querySelectorAll("#pedidosBody tr").forEach(tr=>{
     const numero = tr.dataset.numero.toLowerCase();
     const fabrica = tr.dataset.fabrica.toLowerCase();
-
-    const mostrar =
-      (filtroFabrica === "" || fabrica === filtroFabrica) &&
-      (pesquisaPedido === "" || numero.includes(pesquisaPedido));
-
+    const mostrar = (filtroFabrica=="" || fabrica===filtroFabrica) &&
+                    (pesquisaPedido=="" || numero.includes(pesquisaPedido));
     tr.style.display = mostrar ? "" : "none";
   });
 }
 
-// ======== ABRIR / FECHAR MODAL ========
-function abrirModal(index) {
+// ====== MODAL E-MAIL ======
+function abrirModalEmail(index){
   const row = document.querySelector(`tr[data-index='${index}']`);
   pedidoSelecionado = {
     numero: row.dataset.numero,
     fabrica: row.dataset.fabrica,
-    codigo: row.dataset.codigo,
-    descricao: row.dataset.descricao,
-    quantidade: row.dataset.quantidade
+    codigo: row.dataset.codigo
   };
-  document.getElementById("modalCadastro").style.display = "block";
+  document.getElementById("modalEmail").style.display="block";
 }
 
-function fecharModal() {
-  document.getElementById("modalCadastro").style.display = "none";
+function fecharModal(){
+  document.getElementById("modalEmail").style.display="none";
   pedidoSelecionado = null;
-  document.getElementById("pallets").value = "";
-  document.getElementById("peso").value = "";
-  document.getElementById("estoque").value = "";
+  document.getElementById("fabricaEmail").value="";
+  document.getElementById("emailPrincipal").value="";
+  document.getElementById("emailCopia").value="";
 }
 
-// ======== ENVIAR DADOS PARA PLANILHA ========
-async function enviarDados() {
-  if (!pedidoSelecionado) return;
+// ====== SALVAR EMAIL ======
+async function salvarEmail(){
+  const fabrica = document.getElementById("fabricaEmail").value;
+  const emailPrincipal = document.getElementById("emailPrincipal").value;
+  const emailCopia = document.getElementById("emailCopia").value;
 
-  const pallets = document.getElementById("pallets").value.trim();
-  const peso = document.getElementById("peso").value.trim();
-  const estoque = document.getElementById("estoque").value.trim();
+  if(!fabrica || !emailPrincipal){ alert("Preencha a fábrica e o e-mail principal."); return; }
 
-  if (!pallets || !peso || !estoque) {
-    alert("Preencha todos os campos antes de enviar.");
-    return;
-  }
-
-  const dados = {
-    numero: pedidoSelecionado.numero,
-    fabrica: pedidoSelecionado.fabrica,
-    itens: [{
-      codigo: pedidoSelecionado.codigo,
-      descricao: pedidoSelecionado.descricao,
-      quantidade: pedidoSelecionado.quantidade,
-      pallets,
-      peso,
-      estoque
-    }]
-  };
-
-  try {
-    const response = await fetch(WEB_APP_URL, {
-      method: "POST",
-      body: JSON.stringify(dados)
-    });
-    const result = await response.json();
-    if (result.status === "success") {
-      alert("Dados enviados com sucesso!");
-
-      // linha verde
-      const linhas = document.querySelectorAll("#pedidosBody tr");
-      linhas.forEach(tr => {
-        if (tr.dataset.numero === pedidoSelecionado.numero && tr.dataset.codigo === pedidoSelecionado.codigo) {
-          tr.style.backgroundColor = "#c8f7c5";
-        }
-      });
-
-      fecharModal();
-    } else {
-      alert("Erro ao salvar: " + result.message);
-    }
-  } catch (err) {
-    alert("Erro de conexão com o servidor.");
-  }
+  try{
+    const res = await fetch(WEB_APP_URL+`?action=salvarEmail&fabrica=${encodeURIComponent(fabrica)}&emailPrincipal=${encodeURIComponent(emailPrincipal)}&emailCopia=${encodeURIComponent(emailCopia)}`);
+    const result = await res.text();
+    if(result.includes("success")){ alert("E-mails salvos com sucesso"); fecharModal(); }
+    else alert("Erro ao salvar e-mails");
+  } catch { alert("Erro de conexão"); }
 }
 
-// ======== INÍCIO ========
+// ====== INÍCIO ======
 carregarPedidos();
 </script>
-
 </body>
 </html>
