@@ -3,62 +3,50 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lets Cargo - Visualizar Pedidos</title>
+<title>LetsCargo - Visualizar Pedidos</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f6f8;
+  body { font-family: Arial, sans-serif; background-color: #f2f4f8; padding: 20px; }
+  h1 { color: #003c8f; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 15px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background-color: #0073c9; color: white; }
+  button { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+  .btn-acao { background-color: #0073c9; color: white; }
+  .btn-acao:hover { background-color: #005fa3; }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
     padding: 20px;
+    width: 300px;
+    border-radius: 8px;
   }
-  h1 {
-    text-align: center;
-    color: #003c8f;
-  }
-  table {
+  .modal-content h2 { margin-top: 0; }
+  .modal-content input {
     width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    margin-top: 20px;
-  }
-  th, td {
-    border: 1px solid #ccc;
-    padding: 10px;
-    text-align: center;
-  }
-  th {
-    background-color: #003c8f;
-    color: white;
-  }
-  tr:hover {
-    background-color: #f1f1f1;
-  }
-  button {
-    background-color: #003c8f;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  button:hover {
-    background-color: #0051c7;
-  }
-  .linha-verde {
-    background-color: #c8e6c9 !important;
-    transition: background-color 0.5s ease;
-  }
-  input {
-    width: 80px;
-    padding: 4px;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
     box-sizing: border-box;
+  }
+  .close-btn {
+    background-color: red;
+    color: white;
+    float: right;
   }
 </style>
 </head>
 <body>
 
-<h1>📦 Lets Cargo - Visualizar Pedidos</h1>
+<h1>Visualizar Pedidos - LetsCargo</h1>
 
-<table id="tabelaPedidos">
+<table id="pedidosTable">
   <thead>
     <tr>
       <th>Número do Pedido</th>
@@ -66,29 +54,47 @@
       <th>Código do Item</th>
       <th>Descrição</th>
       <th>Quantidade</th>
-      <th>Pallets</th>
-      <th>Peso Separação</th>
-      <th>Qtd em Estoque</th>
+      <th>Data do Pedido</th>
       <th>Ações</th>
     </tr>
   </thead>
-  <tbody id="corpoTabela">
-    <tr><td colspan="9">Carregando...</td></tr>
+  <tbody id="pedidosBody">
+    <tr><td colspan="7">Carregando pedidos...</td></tr>
   </tbody>
 </table>
 
+<!-- Modal de Cadastro -->
+<div id="modalCadastro" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="fecharModal()">X</button>
+    <h2>Cadastrar Dados</h2>
+    <input type="number" id="pallets" placeholder="Pallets">
+    <input type="number" id="peso" placeholder="Peso Separação (kg)">
+    <input type="number" id="estoque" placeholder="Quantidade em Estoque">
+    <button class="btn-acao" onclick="enviarDados()">Enviar</button>
+  </div>
+</div>
+
 <script>
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzYktRXLVEH-a_GltqzbBptAT7U8EGsEmH5aMX6s5jieBQoPjw08lqUlPfBcjeKbFMLZg/exec";
+let pedidoSelecionado = null;
 
-// ===== CARREGA PEDIDOS =====
+// ======== CARREGAR PEDIDOS ========
 async function carregarPedidos() {
+  const tbody = document.getElementById("pedidosBody");
+  tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
+
   try {
     const res = await fetch(WEB_APP_URL + "?action=get");
     const pedidos = await res.json();
-    const tbody = document.getElementById("corpoTabela");
-    tbody.innerHTML = "";
 
-    pedidos.forEach(p => {
+    if (pedidos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum pedido encontrado</td></tr>`;
+      return;
+    }
+
+    tbody.innerHTML = "";
+    pedidos.forEach((p, i) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${p.numero}</td>
@@ -96,38 +102,63 @@ async function carregarPedidos() {
         <td>${p.codigo}</td>
         <td>${p.descricao}</td>
         <td>${p.quantidade}</td>
-        <td><input type="number" value="${p.pallets || ''}" placeholder="Pallets"></td>
-        <td><input type="number" value="${p.peso || ''}" placeholder="Peso"></td>
-        <td><input type="number" value="${p.estoque || ''}" placeholder="Estoque"></td>
-        <td><button onclick="enviarDados(this)">Enviar</button></td>
+        <td>${p.dataPedido}</td>
+        <td><button class="btn-acao" onclick="abrirModal(${i})">Cadastrar Dados</button></td>
       `;
+      tr.dataset.index = i;
+      tr.dataset.numero = p.numero;
+      tr.dataset.fabrica = p.fabrica;
+      tr.dataset.codigo = p.codigo;
+      tr.dataset.descricao = p.descricao;
+      tr.dataset.quantidade = p.quantidade;
       tbody.appendChild(tr);
     });
   } catch (err) {
-    document.getElementById("corpoTabela").innerHTML = `<tr><td colspan="9">Erro ao carregar pedidos</td></tr>`;
-    console.error(err);
+    tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar pedidos</td></tr>`;
   }
 }
 
-// ===== ENVIA DADOS =====
-async function enviarDados(botao) {
-  const linha = botao.closest("tr");
-  const numero = linha.children[0].innerText;
-  const fabrica = linha.children[1].innerText;
-  const codigo = linha.children[2].innerText;
-  const descricao = linha.children[3].innerText;
-  const quantidade = linha.children[4].innerText;
-  const pallets = linha.children[5].querySelector("input").value;
-  const peso = linha.children[6].querySelector("input").value;
-  const estoque = linha.children[7].querySelector("input").value;
+// ======== ABRIR / FECHAR MODAL ========
+function abrirModal(index) {
+  const row = document.querySelector(`tr[data-index='${index}']`);
+  pedidoSelecionado = {
+    numero: row.dataset.numero,
+    fabrica: row.dataset.fabrica,
+    codigo: row.dataset.codigo,
+    descricao: row.dataset.descricao,
+    quantidade: row.dataset.quantidade
+  };
+  document.getElementById("modalCadastro").style.display = "block";
+}
+
+function fecharModal() {
+  document.getElementById("modalCadastro").style.display = "none";
+  pedidoSelecionado = null;
+  document.getElementById("pallets").value = "";
+  document.getElementById("peso").value = "";
+  document.getElementById("estoque").value = "";
+}
+
+// ======== ENVIAR DADOS PARA PLANILHA ========
+async function enviarDados() {
+  if (!pedidoSelecionado) return;
+
+  const pallets = document.getElementById("pallets").value.trim();
+  const peso = document.getElementById("peso").value.trim();
+  const estoque = document.getElementById("estoque").value.trim();
+
+  if (!pallets || !peso || !estoque) {
+    alert("Preencha todos os campos antes de enviar.");
+    return;
+  }
 
   const dados = {
-    numero,
-    fabrica,
+    numero: pedidoSelecionado.numero,
+    fabrica: pedidoSelecionado.fabrica,
     itens: [{
-      codigo,
-      descricao,
-      quantidade,
+      codigo: pedidoSelecionado.codigo,
+      descricao: pedidoSelecionado.descricao,
+      quantidade: pedidoSelecionado.quantidade,
       pallets,
       peso,
       estoque
@@ -137,24 +168,21 @@ async function enviarDados(botao) {
   try {
     const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      body: JSON.stringify(dados),
-      headers: { "Content-Type": "application/json" }
+      body: JSON.stringify(dados)
     });
-
     const result = await response.json();
-
     if (result.status === "success") {
-      // ✅ Muda a linha para verde somente após atualização na planilha
-      linha.classList.add("linha-verde");
+      alert("Dados enviados com sucesso!");
+      fecharModal();
     } else {
-      alert("Erro ao enviar dados: " + result.message);
+      alert("Erro ao salvar: " + result.message);
     }
   } catch (err) {
-    alert("Erro de conexão: " + err.message);
+    alert("Erro de conexão com o servidor.");
   }
 }
 
-// Carrega pedidos ao abrir a página
+// ======== INÍCIO ========
 carregarPedidos();
 </script>
 
