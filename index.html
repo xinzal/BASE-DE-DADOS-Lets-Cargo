@@ -3,146 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cadastro de Pedidos - Lets Cargo</title>
+<title>Lets Cargo - Visualizar Pedidos</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f6f8;
-        padding: 20px;
-    }
-    h1 {
-        color: #003366;
-        text-align: center;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 15px;
-        background: #fff;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    th, td {
-        padding: 10px;
-        border: 1px solid #ccc;
-        text-align: left;
-    }
-    th {
-        background-color: #003366;
-        color: white;
-    }
-    tr.enviado {
-        background-color: #d4edda !important;
-        transition: background-color 0.8s ease;
-    }
-    button {
-        background-color: #003366;
-        color: white;
-        border: none;
-        padding: 8px 12px;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    button:hover {
-        background-color: #00509e;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f6f8;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #003c8f;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    margin-top: 20px;
+  }
+  th, td {
+    border: 1px solid #ccc;
+    padding: 10px;
+    text-align: center;
+  }
+  th {
+    background-color: #003c8f;
+    color: white;
+  }
+  tr:hover {
+    background-color: #f1f1f1;
+  }
+  button {
+    background-color: #003c8f;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button:hover {
+    background-color: #0051c7;
+  }
+  .linha-verde {
+    background-color: #c8e6c9 !important;
+    transition: background-color 0.5s ease;
+  }
+  input {
+    width: 80px;
+    padding: 4px;
+    box-sizing: border-box;
+  }
 </style>
 </head>
 <body>
 
-<h1>Cadastro de Pedidos - Lets Cargo</h1>
+<h1>📦 Lets Cargo - Visualizar Pedidos</h1>
 
 <table id="tabelaPedidos">
-    <thead>
-        <tr>
-            <th>Número do Pedido</th>
-            <th>Fábrica</th>
-            <th>Código do Item</th>
-            <th>Descrição</th>
-            <th>Quantidade</th>
-            <th>Qtd. Pallets</th>
-            <th>Peso Separação</th>
-            <th>Qtd. em Estoque</th>
-            <th>Ações</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
+  <thead>
+    <tr>
+      <th>Número do Pedido</th>
+      <th>Fábrica</th>
+      <th>Código do Item</th>
+      <th>Descrição</th>
+      <th>Quantidade</th>
+      <th>Pallets</th>
+      <th>Peso Separação</th>
+      <th>Qtd em Estoque</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody id="corpoTabela">
+    <tr><td colspan="9">Carregando...</td></tr>
+  </tbody>
 </table>
 
 <script>
-const webAppUrl = "https://script.google.com/macros/s/AKfycbwXTRiT7-QJjqFvylgDF4-AGRObNBowp5_IXDaytnaM8WFVMS4NfYuBTn2MtL0xHLMAvQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwXTRiT7-QJjqFvylgDF4-AGRObNBowp5_IXDaytnaM8WFVMS4NfYuBTn2MtL0xHLMAvQ/exec";
 
 // ===== CARREGA PEDIDOS =====
 async function carregarPedidos() {
-    try {
-        const response = await fetch(webAppUrl + "?action=get");
-        const pedidos = await response.json();
-        const tbody = document.querySelector("#tabelaPedidos tbody");
-        tbody.innerHTML = "";
+  try {
+    const res = await fetch(WEB_APP_URL + "?action=get");
+    const pedidos = await res.json();
+    const tbody = document.getElementById("corpoTabela");
+    tbody.innerHTML = "";
 
-        pedidos.forEach(pedido => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${pedido.numero}</td>
-                <td>${pedido.fabrica}</td>
-                <td>${pedido.codigo}</td>
-                <td>${pedido.descricao}</td>
-                <td>${pedido.quantidade}</td>
-                <td><input type="text" value="${pedido.pallets || ""}" placeholder="Qtd pallets"></td>
-                <td><input type="text" value="${pedido.peso || ""}" placeholder="Peso separação"></td>
-                <td><input type="text" value="${pedido.estoque || ""}" placeholder="Qtd em estoque"></td>
-                <td><button onclick="enviarDados(this)">Enviar</button></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    } catch (error) {
-        alert("Erro ao carregar pedidos: " + error);
-    }
+    pedidos.forEach(p => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${p.numero}</td>
+        <td>${p.fabrica}</td>
+        <td>${p.codigo}</td>
+        <td>${p.descricao}</td>
+        <td>${p.quantidade}</td>
+        <td><input type="number" value="${p.pallets || ''}" placeholder="Pallets"></td>
+        <td><input type="number" value="${p.peso || ''}" placeholder="Peso"></td>
+        <td><input type="number" value="${p.estoque || ''}" placeholder="Estoque"></td>
+        <td><button onclick="enviarDados(this)">Enviar</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } catch (err) {
+    document.getElementById("corpoTabela").innerHTML = `<tr><td colspan="9">Erro ao carregar pedidos</td></tr>`;
+    console.error(err);
+  }
 }
 
 // ===== ENVIA DADOS =====
 async function enviarDados(botao) {
-    const linha = botao.closest("tr");
-    const numero = linha.children[0].innerText;
-    const fabrica = linha.children[1].innerText;
-    const codigo = linha.children[2].innerText;
-    const descricao = linha.children[3].innerText;
-    const quantidade = linha.children[4].innerText;
-    const pallets = linha.children[5].querySelector("input").value;
-    const peso = linha.children[6].querySelector("input").value;
-    const estoque = linha.children[7].querySelector("input").value;
+  const linha = botao.closest("tr");
+  const numero = linha.children[0].innerText;
+  const fabrica = linha.children[1].innerText;
+  const codigo = linha.children[2].innerText;
+  const descricao = linha.children[3].innerText;
+  const quantidade = linha.children[4].innerText;
+  const pallets = linha.children[5].querySelector("input").value;
+  const peso = linha.children[6].querySelector("input").value;
+  const estoque = linha.children[7].querySelector("input").value;
 
-    const dados = {
-        numero,
-        fabrica,
-        itens: [{
-            codigo,
-            descricao,
-            quantidade,
-            pallets,
-            peso,
-            estoque
-        }]
-    };
+  const dados = {
+    numero,
+    fabrica,
+    itens: [{
+      codigo,
+      descricao,
+      quantidade,
+      pallets,
+      peso,
+      estoque
+    }]
+  };
 
-    try {
-        const response = await fetch(webAppUrl, {
-            method: "POST",
-            body: JSON.stringify(dados),
-            headers: { "Content-Type": "application/json" }
-        });
-        const data = await response.json();
+  try {
+    const response = await fetch(WEB_APP_URL, {
+      method: "POST",
+      body: JSON.stringify(dados),
+      headers: { "Content-Type": "application/json" }
+    });
 
-        if (data.status === "success") {
-            // 🔹 Marca a linha de verde ao enviar com sucesso
-            linha.classList.add("enviado");
-        } else {
-            alert("Erro ao salvar dados: " + data.message);
-        }
-    } catch (error) {
-        alert("Erro de conexão: " + error);
+    const result = await response.json();
+
+    if (result.status === "success") {
+      // ✅ Muda a linha para verde somente após atualização na planilha
+      linha.classList.add("linha-verde");
+    } else {
+      alert("Erro ao enviar dados: " + result.message);
     }
+  } catch (err) {
+    alert("Erro de conexão: " + err.message);
+  }
 }
 
+// Carrega pedidos ao abrir a página
 carregarPedidos();
 </script>
 
