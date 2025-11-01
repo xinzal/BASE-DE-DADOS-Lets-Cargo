@@ -3,129 +3,187 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cadastro Lets Cargo</title>
+<title>LetsCargo - Visualizar Pedidos</title>
 <style>
-  body { font-family: Arial, sans-serif; padding: 20px; background-color: #f4f4f4; }
-  h1 { color: #003c8f; }
-  table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+  body { font-family: Arial, sans-serif; background-color: #f2f4f8; padding: 20px; }
+  h1 { color: #003c8f; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 15px; }
   th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
-  th { background-color: #003c8f; color: white; }
-  button { padding: 5px 10px; cursor: pointer; }
-  .expand-row td { background-color: #e0e0e0; }
-  .expand-row input { width: 80%; margin: 2px 0; padding: 4px; }
+  th { background-color: #0073c9; color: white; }
+  button { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+  .btn-acao { background-color: #0073c9; color: white; }
+  .btn-acao:hover { background-color: #005fa3; }
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 10;
+    left: 0; top: 0; width: 100%; height: 100%;
+    background-color: rgba(0,0,0,0.5);
+  }
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
+  }
+  .modal-content h2 { margin-top: 0; }
+  .modal-content input {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+  }
+  .close-btn {
+    background-color: red;
+    color: white;
+    float: right;
+  }
 </style>
 </head>
 <body>
 
-<h1>Cadastro Lets Cargo</h1>
+<h1>Visualizar Pedidos - LetsCargo</h1>
+
 <table id="pedidosTable">
   <thead>
     <tr>
       <th>Número do Pedido</th>
       <th>Fábrica</th>
-      <th>Código</th>
+      <th>Código do Item</th>
       <th>Descrição</th>
       <th>Quantidade</th>
-      <th>Data</th>
-      <th>Ação</th>
+      <th>Data do Pedido</th>
+      <th>Ações</th>
     </tr>
   </thead>
-  <tbody></tbody>
+  <tbody id="pedidosBody">
+    <tr><td colspan="7">Carregando pedidos...</td></tr>
+  </tbody>
 </table>
 
-<script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzn26hOkbt0mVkMRXkUc93vvw3xQaX2YaQH1sRKEox4goSbpmiF6S0YeybJBoIePKK_zg/exec"; // mesmo web app do site 1
+<!-- Modal de Cadastro -->
+<div id="modalCadastro" class="modal">
+  <div class="modal-content">
+    <button class="close-btn" onclick="fecharModal()">X</button>
+    <h2>Cadastrar Dados</h2>
+    <input type="number" id="pallets" placeholder="Pallets">
+    <input type="number" id="peso" placeholder="Peso Separação (kg)">
+    <input type="number" id="estoque" placeholder="Quantidade em Estoque">
+    <button class="btn-acao" onclick="enviarDados()">Enviar</button>
+  </div>
+</div>
 
-// Carrega pedidos já existentes da aba "Pedidos"
+<script>
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxGnKj6FlqjTnhhzM_Jxj2NjhxhZuLnqlgUpTNjwB8OoM3KPUcRiFmWauGP3inQK5hYjQ/exec";
+let pedidoSelecionado = null;
+
+// ======== CARREGAR PEDIDOS ========
 async function carregarPedidos() {
+  const tbody = document.getElementById("pedidosBody");
+  tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
+
   try {
     const res = await fetch(WEB_APP_URL + "?action=get");
-    if (!res.ok) throw new Error("Falha ao acessar Web App");
     const pedidos = await res.json();
 
-    const tbody = document.querySelector("#pedidosTable tbody");
+    if (pedidos.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7">Nenhum pedido encontrado</td></tr>`;
+      return;
+    }
+
     tbody.innerHTML = "";
-    pedidos.forEach(pedido => {
+    pedidos.forEach((p, i) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
-        <td>${pedido.numero}</td>
-        <td>${pedido.fabrica}</td>
-        <td>${pedido.codigo}</td>
-        <td>${pedido.descricao}</td>
-        <td>${pedido.quantidade}</td>
-        <td>${pedido.dataPedido}</td>
-        <td><button onclick="abrirCadastro('${pedido.numero}')">Lets Cargo</button></td>
+        <td>${p.numero}</td>
+        <td>${p.fabrica}</td>
+        <td>${p.codigo}</td>
+        <td>${p.descricao}</td>
+        <td>${p.quantidade}</td>
+        <td>${p.dataPedido}</td>
+        <td><button class="btn-acao" onclick="abrirModal(${i})">Cadastrar Dados</button></td>
       `;
+      tr.dataset.index = i;
+      tr.dataset.numero = p.numero;
+      tr.dataset.fabrica = p.fabrica;
+      tr.dataset.codigo = p.codigo;
+      tr.dataset.descricao = p.descricao;
+      tr.dataset.quantidade = p.quantidade;
       tbody.appendChild(tr);
     });
   } catch (err) {
-    alert("Erro ao carregar pedidos: " + err.message);
+    tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar pedidos</td></tr>`;
   }
 }
 
-// Abre linha expandida com campos adicionais
-function abrirCadastro(numeroPedido) {
-  const linhas = document.querySelectorAll(".expand-row");
-  linhas.forEach(l => l.remove()); // fecha outras expansões
-
-  const tr = [...document.querySelectorAll("tr")].find(r => r.cells[0]?.innerText === numeroPedido);
-  if (!tr) return;
-
-  const expandTr = document.createElement("tr");
-  expandTr.classList.add("expand-row");
-  expandTr.innerHTML = `
-    <td colspan="7">
-      <label>Quantidade de Pallets:</label><br>
-      <input type="number" id="pallets_${numeroPedido}" min="0"><br>
-      <label>Peso Separação (kg):</label><br>
-      <input type="number" id="peso_${numeroPedido}" min="0" step="0.01"><br>
-      <label>Quantidade em Estoque:</label><br>
-      <input type="number" id="estoque_${numeroPedido}" min="0"><br><br>
-      <button onclick="enviarDados('${numeroPedido}')">Salvar</button>
-    </td>
-  `;
-  tr.parentNode.insertBefore(expandTr, tr.nextSibling);
+// ======== ABRIR / FECHAR MODAL ========
+function abrirModal(index) {
+  const row = document.querySelector(`tr[data-index='${index}']`);
+  pedidoSelecionado = {
+    numero: row.dataset.numero,
+    fabrica: row.dataset.fabrica,
+    codigo: row.dataset.codigo,
+    descricao: row.dataset.descricao,
+    quantidade: row.dataset.quantidade
+  };
+  document.getElementById("modalCadastro").style.display = "block";
 }
 
-// Envia dados adicionais (Pallets, Peso, Estoque) para a mesma aba “Pedidos”
-async function enviarDados(numeroPedido) {
-  const pallets = document.getElementById(`pallets_${numeroPedido}`).value;
-  const peso = document.getElementById(`peso_${numeroPedido}`).value;
-  const estoque = document.getElementById(`estoque_${numeroPedido}`).value;
+function fecharModal() {
+  document.getElementById("modalCadastro").style.display = "none";
+  pedidoSelecionado = null;
+  document.getElementById("pallets").value = "";
+  document.getElementById("peso").value = "";
+  document.getElementById("estoque").value = "";
+}
+
+// ======== ENVIAR DADOS PARA PLANILHA ========
+async function enviarDados() {
+  if (!pedidoSelecionado) return;
+
+  const pallets = document.getElementById("pallets").value.trim();
+  const peso = document.getElementById("peso").value.trim();
+  const estoque = document.getElementById("estoque").value.trim();
 
   if (!pallets || !peso || !estoque) {
-    alert("Preencha todos os campos!");
+    alert("Preencha todos os campos antes de enviar.");
     return;
   }
 
-  const data = {
-    tipo: "letscargo",
-    numeroPedido,
-    pallets,
-    peso,
-    estoque
+  const dados = {
+    numero: pedidoSelecionado.numero,
+    fabrica: pedidoSelecionado.fabrica,
+    itens: [{
+      codigo: pedidoSelecionado.codigo,
+      descricao: pedidoSelecionado.descricao,
+      quantidade: pedidoSelecionado.quantidade,
+      pallets,
+      peso,
+      estoque
+    }]
   };
 
   try {
-    const res = await fetch(WEB_APP_URL, {
+    const response = await fetch(WEB_APP_URL, {
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(dados)
     });
-
-    const result = await res.json();
+    const result = await response.json();
     if (result.status === "success") {
-      alert("Informações salvas com sucesso!");
-      carregarPedidos();
+      alert("Dados enviados com sucesso!");
+      fecharModal();
     } else {
-      alert("Erro: " + result.message);
+      alert("Erro ao salvar: " + result.message);
     }
   } catch (err) {
     alert("Erro de conexão com o servidor.");
   }
 }
 
-// Carregar pedidos ao abrir a página
-window.onload = carregarPedidos;
+// ======== INÍCIO ========
+carregarPedidos();
 </script>
 
 </body>
