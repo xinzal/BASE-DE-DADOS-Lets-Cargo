@@ -3,163 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LetsCargo Dashboard - Visualizar Pedidos</title>
+<title>LetsCargo - Visualizar Pedidos</title>
 <style>
-  /* ===== BODY ===== */
-  body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f7fa;
-    margin: 0;
-    padding: 0;
-  }
-
-  /* ===== CABEÇALHO ===== */
-  header {
-    background-color: #0073c9;
-    color: white;
-    padding: 20px;
-    text-align: center;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
-
-  header h1 {
-    margin: 0;
-    font-size: 28px;
-  }
-
-  /* ===== CONTAINER ===== */
-  .container {
-    max-width: 1200px;
-    margin: 20px auto;
-    padding: 0 20px;
-  }
-
-  /* ===== CARDS DE RESUMO ===== */
-  .cards {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    margin-bottom: 25px;
-    justify-content: center;
-  }
-
-  .card {
-    flex: 1 1 200px;
-    background-color: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    transition: 0.3s;
-  }
-
-  .card:hover {
-    box-shadow: 0 6px 18px rgba(0,0,0,0.1);
-  }
-
-  .card h2 {
-    margin: 10px 0 0 0;
-    font-size: 24px;
-    color: #0073c9;
-  }
-
-  .card p {
-    margin: 0;
-    color: #555;
-    font-weight: bold;
-  }
-
-  /* ===== FILTROS ===== */
-  .filtros {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
-    margin-bottom: 15px;
-    justify-content: center;
-  }
-
-  .filtros label {
-    font-weight: bold;
-    margin-right: 5px;
-  }
-
-  .filtros select,
-  .filtros input {
-    padding: 8px 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    outline: none;
-    font-size: 14px;
-    transition: 0.2s;
-  }
-
-  .filtros select:focus,
-  .filtros input:focus {
-    border-color: #0073c9;
-    box-shadow: 0 0 5px rgba(0,115,201,0.3);
-  }
-
-  /* ===== TABELA ===== */
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: #fff;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-  }
-
-  th, td {
-    padding: 12px 15px;
-    text-align: left;
-  }
-
-  th {
-    background-color: #0073c9;
-    color: white;
-    font-weight: 600;
-  }
-
-  tbody tr:nth-child(even) {
-    background-color: #f8f9fb;
-  }
-
-  tbody tr:hover {
-    background-color: #dbe9f7;
-  }
-
-  tbody tr.cadastrado {
-    background-color: #c8f7c5 !important;
-  }
-
-  /* ===== BOTÕES ===== */
-  button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: 0.2s;
-  }
-
-  .btn-acao {
-    background-color: #0073c9;
-    color: white;
-  }
-
-  .btn-acao:hover {
-    background-color: #005fa3;
-  }
-
-  .close-btn {
-    background-color: red;
-    color: white;
-    float: right;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  /* ===== MODAL ===== */
+  body { font-family: Arial, sans-serif; background-color: #f2f4f8; padding: 20px; }
+  h1 { color: #003c8f; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; background-color: #fff; margin-top: 15px; }
+  th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+  th { background-color: #0073c9; color: white; }
+  button { padding: 6px 10px; border: none; border-radius: 4px; cursor: pointer; }
+  .btn-acao { background-color: #0073c9; color: white; }
+  .btn-acao:hover { background-color: #005fa3; }
   .modal {
     display: none;
     position: fixed;
@@ -167,106 +20,61 @@
     left: 0; top: 0; width: 100%; height: 100%;
     background-color: rgba(0,0,0,0.5);
   }
-
   .modal-content {
-    background-color: #fff;
-    margin: 8% auto;
-    padding: 25px 20px;
-    width: 350px;
-    border-radius: 12px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    position: relative;
-    animation: slideDown 0.3s ease;
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 300px;
+    border-radius: 8px;
   }
-
-  .modal-content h2 {
-    margin-top: 0;
-    color: #0073c9;
-    text-align: center;
-  }
-
+  .modal-content h2 { margin-top: 0; }
   .modal-content input {
     width: 100%;
-    padding: 10px 12px;
-    margin-bottom: 12px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    outline: none;
-    transition: 0.2s;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
   }
-
-  .modal-content input:focus {
-    border-color: #0073c9;
-    box-shadow: 0 0 5px rgba(0,115,201,0.3);
-  }
-
-  @keyframes slideDown {
-    from { transform: translateY(-50px); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  .close-btn {
+    background-color: red;
+    color: white;
+    float: right;
   }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>LetsCargo Dashboard</h1>
-</header>
+<h1>Visualizar Pedidos - LetsCargo</h1>
 
-<div class="container">
+<!-- FILTRO E PESQUISA -->
+<div style="margin-bottom: 10px;">
+  <label for="filtroFabrica">Filtrar por Fábrica:</label>
+  <select id="filtroFabrica" onchange="filtrarTabela()">
+    <option value="">Todas</option>
+  </select>
 
-  <!-- CARDS DE RESUMO -->
-  <div class="cards">
-    <div class="card">
-      <p>Total de Pedidos</p>
-      <h2 id="totalPedidos">0</h2>
-    </div>
-    <div class="card">
-      <p>Pedidos Cadastrados</p>
-      <h2 id="pedidosCadastrados">0</h2>
-    </div>
-    <div class="card">
-      <p>Pedidos Pendentes</p>
-      <h2 id="pedidosPendentes">0</h2>
-    </div>
-  </div>
-
-  <!-- FILTRO E PESQUISA -->
-  <div class="filtros">
-    <div>
-      <label for="filtroFabrica">Filtrar por Fábrica:</label>
-      <select id="filtroFabrica" onchange="filtrarTabela()">
-        <option value="">Todas</option>
-      </select>
-    </div>
-
-    <div>
-      <label for="pesquisaPedido">Pesquisar Número do Pedido:</label>
-      <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Digite o número do pedido">
-    </div>
-  </div>
-
-  <!-- TABELA -->
-  <table id="pedidosTable">
-    <thead>
-      <tr>
-        <th>Número do Pedido</th>
-        <th>Fábrica</th>
-        <th>Código do Item</th>
-        <th>Descrição</th>
-        <th>Quantidade</th>
-        <th>Data do Pedido</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-    <tbody id="pedidosBody">
-      <tr><td colspan="7">Carregando pedidos...</td></tr>
-    </tbody>
-  </table>
-
+  <label for="pesquisaPedido" style="margin-left: 20px;">Pesquisar Número do Pedido:</label>
+  <input type="text" id="pesquisaPedido" oninput="filtrarTabela()" placeholder="Digite o número do pedido">
 </div>
 
-<!-- MODAL DE CADASTRO -->
+<table id="pedidosTable">
+  <thead>
+    <tr>
+      <th>Número do Pedido</th>
+      <th>Fábrica</th>
+      <th>Código do Item</th>
+      <th>Descrição</th>
+      <th>Quantidade</th>
+      <th>Data do Pedido</th>
+      <th>Ações</th>
+    </tr>
+  </thead>
+  <tbody id="pedidosBody">
+    <tr><td colspan="7">Carregando pedidos...</td></tr>
+  </tbody>
+</table>
+
+<!-- Modal de Cadastro -->
 <div id="modalCadastro" class="modal">
   <div class="modal-content">
     <button class="close-btn" onclick="fecharModal()">X</button>
@@ -282,7 +90,7 @@
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyzRQQNQcTmcgkihOKmFj_MKRpzZBmjdlQGyaNj1BZ59IV89UWI0RzP3o7VRHsWrGTmTA/exec";
 let pedidoSelecionado = null;
 
-// ===== CARREGAR PEDIDOS =====
+// ======== CARREGAR PEDIDOS ========
 async function carregarPedidos() {
   const tbody = document.getElementById("pedidosBody");
   tbody.innerHTML = `<tr><td colspan="7">Carregando...</td></tr>`;
@@ -297,8 +105,6 @@ async function carregarPedidos() {
     }
 
     tbody.innerHTML = "";
-    let cadastrados = 0;
-
     pedidos.forEach((p, i) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -317,33 +123,25 @@ async function carregarPedidos() {
       tr.dataset.descricao = p.descricao;
       tr.dataset.quantidade = p.quantidade;
 
+      // linha verde se já houver cadastro
       if (p.pallets || p.peso || p.estoque) {
-        tr.classList.add('cadastrado');
-        cadastrados++;
+        tr.style.backgroundColor = "#c8f7c5";
       }
 
       tbody.appendChild(tr);
     });
 
+    // popular filtro de fábrica
     atualizarFiltroFabrica(pedidos);
-    atualizarResumo(pedidos.length, cadastrados);
 
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="7">Erro ao carregar pedidos</td></tr>`;
   }
 }
 
-// ===== RESUMO =====
-function atualizarResumo(total, cadastrados) {
-  document.getElementById("totalPedidos").innerText = total;
-  document.getElementById("pedidosCadastrados").innerText = cadastrados;
-  document.getElementById("pedidosPendentes").innerText = total - cadastrados;
-}
-
-// ===== FILTRO =====
+// ======== FILTRO E PESQUISA ========
 function atualizarFiltroFabrica(pedidos) {
   const select = document.getElementById("filtroFabrica");
-  select.innerHTML = '<option value="">Todas</option>';
   const fabricas = [...new Set(pedidos.map(p => p.fabrica))];
   fabricas.forEach(f => {
     const option = document.createElement("option");
@@ -361,14 +159,16 @@ function filtrarTabela() {
   linhas.forEach(tr => {
     const numero = tr.dataset.numero.toLowerCase();
     const fabrica = tr.dataset.fabrica.toLowerCase();
+
     const mostrar =
       (filtroFabrica === "" || fabrica === filtroFabrica) &&
       (pesquisaPedido === "" || numero.includes(pesquisaPedido));
+
     tr.style.display = mostrar ? "" : "none";
   });
 }
 
-// ===== MODAL =====
+// ======== ABRIR / FECHAR MODAL ========
 function abrirModal(index) {
   const row = document.querySelector(`tr[data-index='${index}']`);
   pedidoSelecionado = {
@@ -389,7 +189,7 @@ function fecharModal() {
   document.getElementById("estoque").value = "";
 }
 
-// ===== ENVIAR DADOS =====
+// ======== ENVIAR DADOS PARA PLANILHA ========
 async function enviarDados() {
   if (!pedidoSelecionado) return;
 
@@ -423,13 +223,15 @@ async function enviarDados() {
     const result = await response.json();
     if (result.status === "success") {
       alert("Dados enviados com sucesso!");
+
+      // linha verde
       const linhas = document.querySelectorAll("#pedidosBody tr");
       linhas.forEach(tr => {
         if (tr.dataset.numero === pedidoSelecionado.numero && tr.dataset.codigo === pedidoSelecionado.codigo) {
-          tr.classList.add('cadastrado');
+          tr.style.backgroundColor = "#c8f7c5";
         }
       });
-      carregarPedidos();
+
       fecharModal();
     } else {
       alert("Erro ao salvar: " + result.message);
@@ -439,7 +241,7 @@ async function enviarDados() {
   }
 }
 
-// ===== INÍCIO =====
+// ======== INÍCIO ========
 carregarPedidos();
 </script>
 
