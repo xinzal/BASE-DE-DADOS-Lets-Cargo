@@ -34,12 +34,12 @@
 </table>
 
 <script>
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxbe32msdiYUNEwxyv5Zs_V8f1uW59YM1qYIWg5Tu_n8mRiJ3l75Xn9KOYlN9uiJaioew/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycby8Klts981j5GjXR8bVf3-ALkamTyBVEHSTdPdn7g4Z-3x_snaQdXiWYL0sUUjHne5F9g/exec"; // mesmo web app do site 1
 
-// Carrega pedidos via GET
+// Carrega pedidos já existentes da aba "Pedidos"
 async function carregarPedidos() {
   try {
-    const res = await fetch(WEB_APP_URL + "?action=getPedidos");
+    const res = await fetch(WEB_APP_URL + "?action=get");
     if (!res.ok) throw new Error("Falha ao acessar Web App");
     const pedidos = await res.json();
 
@@ -54,7 +54,7 @@ async function carregarPedidos() {
         <td>${pedido.descricao}</td>
         <td>${pedido.quantidade}</td>
         <td>${pedido.dataPedido}</td>
-        <td><button onclick="toggleExpand(this, '${pedido.numero}')">Lets Cargo</button></td>
+        <td><button onclick="abrirCadastro('${pedido.numero}')">Lets Cargo</button></td>
       `;
       tbody.appendChild(tr);
     });
@@ -63,15 +63,13 @@ async function carregarPedidos() {
   }
 }
 
-// Linha expandida para cadastro de pallets
-function toggleExpand(btn, numeroPedido) {
-  const tr = btn.parentElement.parentElement;
-  const nextTr = tr.nextElementSibling;
+// Abre linha expandida com campos adicionais
+function abrirCadastro(numeroPedido) {
+  const linhas = document.querySelectorAll(".expand-row");
+  linhas.forEach(l => l.remove()); // fecha outras expansões
 
-  if (nextTr && nextTr.classList.contains("expand-row")) {
-    nextTr.remove();
-    return;
-  }
+  const tr = [...document.querySelectorAll("tr")].find(r => r.cells[0]?.innerText === numeroPedido);
+  if (!tr) return;
 
   const expandTr = document.createElement("tr");
   expandTr.classList.add("expand-row");
@@ -79,7 +77,7 @@ function toggleExpand(btn, numeroPedido) {
     <td colspan="7">
       <label>Quantidade de Pallets:</label><br>
       <input type="number" id="pallets_${numeroPedido}" min="0"><br>
-      <label>Peso Separação:</label><br>
+      <label>Peso Separação (kg):</label><br>
       <input type="number" id="peso_${numeroPedido}" min="0" step="0.01"><br>
       <label>Quantidade em Estoque:</label><br>
       <input type="number" id="estoque_${numeroPedido}" min="0"><br><br>
@@ -89,7 +87,7 @@ function toggleExpand(btn, numeroPedido) {
   tr.parentNode.insertBefore(expandTr, tr.nextSibling);
 }
 
-// Envia dados via POST para aba LetsCargo
+// Envia dados adicionais (Pallets, Peso, Estoque) para a mesma aba “Pedidos”
 async function enviarDados(numeroPedido) {
   const pallets = document.getElementById(`pallets_${numeroPedido}`).value;
   const peso = document.getElementById(`peso_${numeroPedido}`).value;
@@ -100,36 +98,33 @@ async function enviarDados(numeroPedido) {
     return;
   }
 
-  const data = { 
+  const data = {
     tipo: "letscargo",
     numeroPedido,
-    pallets: Number(pallets),
-    peso: Number(peso),
-    estoque: Number(estoque)
+    pallets,
+    peso,
+    estoque
   };
 
   try {
     const res = await fetch(WEB_APP_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
 
-    if (!res.ok) throw new Error("Falha ao enviar dados");
     const result = await res.json();
-    alert(result.message);
-
-    const expandTr = document.getElementById(`pallets_${numeroPedido}`).closest("tr");
-    if (expandTr) expandTr.remove();
-
-    // Atualiza a tabela
-    carregarPedidos();
+    if (result.status === "success") {
+      alert("Informações salvas com sucesso!");
+      carregarPedidos();
+    } else {
+      alert("Erro: " + result.message);
+    }
   } catch (err) {
-    alert("Erro ao salvar dados: " + err.message);
+    alert("Erro de conexão com o servidor.");
   }
 }
 
-// Inicializa ao carregar a página
+// Carregar pedidos ao abrir a página
 window.onload = carregarPedidos;
 </script>
 
